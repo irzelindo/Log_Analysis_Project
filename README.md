@@ -49,9 +49,8 @@ In order to make the job easier, I've created [one view](https://www.postgresql.
 3. On which days did more than 1% of requests lead to errors?
   * create view requests as select time::date as day,
       sum((status like '%4%' OR status like '%5%')::int) as errors,
-      sum((status like '%1%' OR status like '%2%' OR status like '%3%'
-      OR status like '%4%' OR status like '%5%')::int) as total
-      from log group by day;
+      *count(*)* as total from log group by day;
+
   *_Next_* you can make a query
   * select * from (select day, *round((round(errors,2)*100)/round(total,2),2)*
       as percentage from requests) as bad_day where percentage>1;
