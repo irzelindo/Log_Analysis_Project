@@ -27,7 +27,7 @@ In order to achieve the goal of this project we will need some additional knowle
 3. Then switch to database using command **psql -d news -f newsdata.sql**.
 4. Once you have the data loaded into your database, connect to your database using **psql -d news** and explore the tables using the \dt and \d table commands and select statements.
 * * *
-### Now comes the relevant part
+### Requirements to run DB queries
 
 In order to make the job easier, I've created [views](https://www.postgresql.org/docs/9.2/static/sql-createview.html) for answering two of folowing questions: (2 and 3),
 
@@ -45,6 +45,8 @@ In order to make the job easier, I've created [views](https://www.postgresql.org
   *_Next_* can make a query
   * select * from (select day, *round((round(errors,2)*100)/round(total,2),2)* as percentage from requests) 
     as bad_day where percentage>1;
+ * * *
+ After all put **log.py** and **dbnews.py** in the same file, copy this file into vagrant directory in order to make this file available from virtual machine. access the file from virtual machine and run **python log.py**
     
 
 
