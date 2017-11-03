@@ -13,18 +13,21 @@ def connect(DBNAME="news"):
         print("error trying to connect to DB")
 
 
+def close_connection(db,cursor):
+    cursor.close()
+    db.close()
+
+
 def question_one():
     """ Method Will return question #1 answer from database """
     db, cursor = connect()
     cursor.execute("""select articles.title as article,
                     count(*) as views from log,
-                    articles where log.path
-                    like(concat('/article/',articles.slug))
+                    articles where log.path = concat('/article/',articles.slug)
                     group by article order by views desc limit 3""")
     answer_one = cursor.fetchall()
+    close_connection(db,cursor)
     return answer_one
-    db.close()
-    cursor.close()
 
 
 def question_two():
@@ -32,14 +35,13 @@ def question_two():
     db, cursor = connect()
     cursor.execute("""select name, sum(views) as views from (select authors.name,
                     articles.title, count(*) as views from log, articles,
-                    authors where log.path like(concat('/article/',
-                    articles.slug)) AND authors.id = articles.author
+                    authors where log.path = concat('/article/',
+                    articles.slug) AND authors.id = articles.author
                     group by authors.name, articles.title order by views desc)
                     as article_views group by name order by views desc""")
     answer_two = cursor.fetchall()
+    close_connection(db,cursor)
     return answer_two
-    db.close()
-    cursor.close()
 
 
 def question_three():
@@ -50,6 +52,5 @@ def question_three():
                     as percentage from requests) as bad_day where
                     percentage>1""")
     answer_three = cursor.fetchall()
+    close_connection(db,cursor)
     return answer_three
-    db.close()
-    cursor.close()
