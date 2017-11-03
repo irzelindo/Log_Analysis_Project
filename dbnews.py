@@ -3,13 +3,15 @@
 
 import psycopg2
 
-def connect(DBNAME = "news"):
+
+def connect(DBNAME="news"):
     try:
         db = psycopg2.connect("dbname={}".format(DBNAME))
         cursor = db.cursor()
         return db, cursor
     except:
         print("error trying to connect to DB")
+
 
 def question_one():
     """ Method Will return question #1 answer from database """
