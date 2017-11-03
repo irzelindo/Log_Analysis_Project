@@ -3,7 +3,7 @@ You've been hired onto a team working on a newspaper site. The user-facing newsp
 
 The main purpose of this project is to put both python and postgresql in work, so the task is to create a reporting tool that prints out reports (*in plain text*) based on the data in the database. This reporting tool is a Python program using the psycopg2 module to connect to the database.
 * * *
-### Knoledge Requirements
+### knowledge Requirements
 In order to achieve the goal of this project we will need some additional knowledge as:
 1. Linux server basics
     * Navegate between folders
@@ -29,24 +29,31 @@ In order to achieve the goal of this project we will need some additional knowle
 * * *
 ### Requirements to run DB queries
 
-In order to make the job easier, I've created [views](https://www.postgresql.org/docs/9.2/static/sql-createview.html) for answering two of folowing questions: (2 and 3),
+In order to make the job easier, I've created [one view](https://www.postgresql.org/docs/9.2/static/sql-createview.html) for answering question number three.
 
-1. What are the most popular three articles of all time? 
-  * select articles.slug as article, *count(*)* as views from articles, log where log.path like(concat('%',articles.slug,'%')) group         by article order by views desc limit 3;
+1. What are the most popular three articles of all time?
+  * select articles.title as article,
+      **count(*)** as views from log,
+      articles where log.path
+      like(concat('/article/',articles.slug))
+      group by article order by views desc limit 3;
+
 2. Who are the most popular article authors of all time?
-  * create view article_views as select authors.name, articles.slug,*count(*)* as views from articles, log, authors where log.path           like(concat('%',articles.slug,'%')) AND authors.id = articles.author group by authors.name, articles.slug order by authors.name         desc;
-  *_Next_* can make a query
-  * select name, sum(views) as views from article_views group by name order by views desc;
-    
-3. On which days did more than 1% of requests lead to errors? 
-  * create view requests as select time::date as day,sum((status like '%4%' OR status like '%5%')::int) as errors,
-    sum((status like '%1%' OR status like '%2%' OR status like '%3%' OR status like '%4%' OR status like '%5%')::int) as total
-    from log group by day;
-  *_Next_* can make a query
-  * select * from (select day, *round((round(errors,2)*100)/round(total,2),2)* as percentage from requests) 
-    as bad_day where percentage>1;
+  * select name, sum(views) as views from (select authors.name,
+      articles.title,**count(*)** as views from log, articles,
+      authors where log.path like(concat('/article/',articles.slug))
+      AND authors.id = articles.author group by authors.name,
+      articles.title order by viewsdesc) as article_views
+      group by name order by views desc;
+
+3. On which days did more than 1% of requests lead to errors?
+  * create view requests as select time::date as day,
+      sum((status like '%4%' OR status like '%5%')::int) as errors,
+      sum((status like '%1%' OR status like '%2%' OR status like '%3%'
+      OR status like '%4%' OR status like '%5%')::int) as total
+      from log group by day;
+  *_Next_* you can make a query
+  * select * from (select day, *round((round(errors,2)*100)/round(total,2),2)*
+      as percentage from requests) as bad_day where percentage>1;
  * * *
- After all put **log.py** and **dbnews.py** in the same file, copy this file into vagrant directory in order to make this file available from virtual machine. access the file from virtual machine and run **python log.py**
-    
-
-
+ After all put **log.py** and **dbnews.py** in the same file, copy this file into vagrant directory in order to make this file available from virtual machine. Access the file from virtual machine and run the command**python log.py**
